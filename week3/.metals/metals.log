@@ -1,0 +1,47 @@
+2023.03.09 14:38:38 INFO  Started: Metals version 0.11.11 in workspace 'C:\Users\Ethan\Documents\Uni\COMP3100\week3' for client Visual Studio Code 1.76.0.
+SLF4J: No SLF4J providers were found.
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See https://www.slf4j.org/codes.html#noProviders for further details.
+SLF4J: Class path contains SLF4J bindings targeting slf4j-api versions 1.7.x or earlier.
+SLF4J: Ignoring binding found at [jar:file:/C:/Users/Ethan/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/com/outr/scribe-slf4j_2.13/3.11.0/scribe-slf4j_2.13-3.11.0.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See https://www.slf4j.org/codes.html#ignoredBindings for an explanation.
+2023.03.09 14:38:42 INFO  time: initialize in 3.26s
+2023.03.09 14:38:45 WARN  Build server is not auto-connectable.
+2023.03.09 14:38:45 WARN  no build tool detected in workspace 'C:\Users\Ethan\Documents\Uni\COMP3100\week3'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2023.03.09 14:38:45 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+Mar 09, 2023 2:38:45 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Mar 09, 2023 2:38:47 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTrace
+Mar 09, 2023 2:38:58 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 5
+2023.03.09 14:39:15 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyClient.java
+Mar 09, 2023 2:39:23 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 28
+2023.03.09 14:39:27 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+2023.03.09 14:39:28 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyClient.java
+2023.03.09 14:40:37 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+2023.03.09 14:41:36 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+Mar 09, 2023 2:41:58 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 188
+2023.03.09 14:42:15 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+Mar 09, 2023 2:42:18 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 257
+2023.03.09 14:42:24 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+Mar 09, 2023 2:42:25 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 283
+2023.03.09 14:42:47 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+2023.03.09 14:43:02 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+2023.03.09 14:43:19 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+Mar 09, 2023 2:43:47 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 441
+Mar 09, 2023 2:44:14 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 518
+Mar 09, 2023 2:44:17 PM org.eclipse.lsp4j.jsonrpc.RemoteEndpoint handleCancellation
+WARNING: Unmatched cancel notification for request id 526
+2023.03.09 14:44:19 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyClient.java
+2023.03.09 14:44:24 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyClient.java
+2023.03.09 14:44:29 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyClient.java
+2023.03.09 14:45:29 WARN  no build target for: C:\Users\Ethan\Documents\Uni\COMP3100\week3\MyServer.java
+2023.03.09 14:45:58 INFO  Shutting down server
+2023.03.09 14:45:58 INFO  shutting down Metals
