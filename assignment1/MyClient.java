@@ -115,7 +115,7 @@ public class MyClient {
             reply = dialogue("AUTH " + user + "\n");
 
             reply = dialogue("REDY\n");
-            String jobID = reply.split(" ")[2];
+            Job job = new Job(reply.split(" "));
 
             reply = dialogue("GETS All\n");
 
@@ -129,7 +129,7 @@ public class MyClient {
 
             String[] largestServer = FindLargest(servers).split(" ");
 
-            send(String.format("SCHD %s %s %s\n", jobID, largestServer[0], largestServer[1]));
+            send(String.format("SCHD %s %s %s\n", job.id, largestServer[0], largestServer[1]));
             reply = receive();
 
             send("QUIT\n");
@@ -157,5 +157,22 @@ public class MyClient {
 
         MyClient client = new MyClient(log);
         client.run();
+    }
+}
+
+class Job {
+    public int id;
+    public int estRunTime;
+    public int core;
+    public int memory;
+    public int disk;
+
+    public Job(String[] jobString) {
+        // jobString is {JOBN, submitTime, jobID, estRuntime, core, memory, disk}
+        id = Integer.parseInt(jobString[2]);
+        estRunTime = Integer.parseInt(jobString[3]);
+        core = Integer.parseInt(jobString[4]);
+        memory = Integer.parseInt(jobString[5]);
+        disk = Integer.parseInt(jobString[6]);
     }
 }
