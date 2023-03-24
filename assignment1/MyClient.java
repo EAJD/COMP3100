@@ -3,21 +3,43 @@ import java.net.*;
 
 public class MyClient {
 
-    private static void send(DataOutputStream dout, String message) {
+    private Socket s;
+    private DataOutputStream output;
+    private BufferedReader input;
+
+    private boolean log;
+
+    public MyClient(boolean log) {
         try {
-            System.out.println("Sending: " + message);
-            dout.write(message.getBytes());
-            dout.flush();
+            s = new Socket("localhost", 50000);
+            output = new DataOutputStream(s.getOutputStream());
+            input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
+        this.log = log;
+    }
+
+    private void send(String message) {
+        try {
+            if (log) {
+                System.out.println("C SENT " + message.replace("\n", ""));
+            }
+            output.write(message.getBytes());
+            output.flush();
         }
         catch (Exception e) {
             System.out.println(e);
         }
     }
 
-    private static String receive(BufferedReader in) {
+    private String receive() {
         try {
-            String reply = in.readLine();
-            System.out.println("Server said: " + reply + "\n");
+            String reply = input.readLine();
+            if (log) {
+                System.out.println("C RCVD " + reply);
+            }
             return reply;
         }
         catch (Exception e) {
@@ -26,77 +48,52 @@ public class MyClient {
         }
     }
 
-    public static void main(String[] args) {
+    private String[] receiveLines(int length) {
         try {
-            Socket s = new Socket("localhost", 50000);
-            DataOutputStream dout = new DataOutputStream(s.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-            String user = "Ethan";
-
-            send(dout, "HELO\n");
-            String reply = receive(in);
-
-            if (!reply.equals("OK")) {
-                return;
-            }
-
-            send(dout, "AUTH " + user + "\n");
-            reply = receive(in);
-
-            if (!reply.equals("OK")) {
-                return;
-            }
-
-            send(dout, "REDY\n");
-            reply = receive(in);
-            String jobID = reply.split(" ")[2];
-
-            send(dout, "GETS All\n");
-            reply = receive(in);
-
-            int num = Integer.parseInt(reply.split(" ")[1]);
-            String[] servers = new String[num];
-
-            send(dout, "OK\n");
-            reply = receive(in);
+            String[] reply = new String[length];
+            String line;
 
             int index = 0;
-            while(!reply.equals(".")){
-                servers[index] = reply;
+            while (index < length) {
+                line = input.readLine();
+                reply[index] = line;
                 index++;
-                send(dout, "OK\n");
-                reply = receive(in);
             }
-            String[] largestServer = FindLargest(servers).split(" ");
-
-            send(dout, String.format("SCHD %s %s %s\n", jobID, largestServer[0], largestServer[1]));
-            reply = receive(in);
-
-            // send(dout, "REDY\n");
-            // reply = receive(in);
-
-            // while(!reply.equals("NONE")){
-            //     jobID = reply.split(" ")[2];
-
-            //     send(dout, String.format("SCHD %s %s %s\n", jobID, largestServer[0], largestServer[1]));
-            //     reply = receive(in);
-
-            //     send(dout, "REDY\n");
-            //     reply = receive(in);
-            // }
-
-            send(dout, "QUIT\n");
-            reply = receive(in);
-
-            s.close();
-
-        } catch(Exception e) {
+            if (log) {
+                System.out.println("C RCVD " + reply[0]);
+                for (int i = 1; i < length; i++) {
+                    System.out.println(reply[i]);
+                }
+            }
+            return reply;
+        }
+        catch (Exception e) {
             System.out.println(e);
+            return null;
         }
     }
 
-    private static String FindLargest(String[] servers){
+    private String dialogue(String message) {
+        try {
+            if (log) {
+                System.out.println("C SENT " + message.replace("\n", ""));
+            }
+            output.write(message.getBytes());
+            output.flush();
+
+            String reply = input.readLine();
+            if (log) {
+                System.out.println("C RCVD " + reply);
+            }
+            return reply;
+        }
+        catch (Exception e) {
+            System.out.println(e);
+            return "";
+        }
+    }
+
+    private String FindLargest(String[] servers){
         int size = 0;
         String result = null;
 
@@ -110,4 +107,55 @@ public class MyClient {
 
         return result;
     }
-}  
+
+    public void run() {
+        try {
+            String user = "Ethan";
+            String reply = dialogue("HELO\n");
+            reply = dialogue("AUTH " + user + "\n");
+
+            reply = dialogue("REDY\n");
+            String jobID = reply.split(" ")[2];
+
+            reply = dialogue("GETS All\n");
+
+            int length = Integer.parseInt(reply.split(" ")[1]);
+
+            send("OK\n");
+
+            String[] servers = receiveLines(length);
+
+            reply = dialogue("OK\n");
+
+            String[] largestServer = FindLargest(servers).split(" ");
+
+            send(String.format("SCHD %s %s %s\n", jobID, largestServer[0], largestServer[1]));
+            reply = receive();
+
+            send("QUIT\n");
+            reply = receive();
+
+            s.close();
+
+        } catch(Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void main(String[] args) {
+        boolean log = false;
+
+        if (args.length > 1) {
+            if (args[0].equals("-v") && args[1].equals("brief")) {
+                log = true;
+            }
+            else {
+                System.out.println("Incorrect arguements");
+                return;
+            }
+        }
+
+        MyClient client = new MyClient(log);
+        client.run();
+    }
+}
