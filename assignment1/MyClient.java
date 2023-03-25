@@ -136,10 +136,8 @@ public class MyClient {
                 
                 // Get next job
                 reply = dialogue("REDY\n");
-                if (reply.split(" ")[0].equals("JOBN")) {
-                    job = reply.split(" ");
-                }
-                else {
+                job = reply.split(" ");
+                if (!job[0].equals("JOBN")) {
                     job = null;
                 }
             }
