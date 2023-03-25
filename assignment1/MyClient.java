@@ -22,6 +22,7 @@ public class MyClient {
     }
 
     private void send(String message) {
+        // Sends a message to the server
         try {
             if (log) {
                 System.out.println("C SENT " + message.replace("\n", ""));
@@ -35,6 +36,7 @@ public class MyClient {
     }
 
     private String receive() {
+        // Receives a message from the server
         try {
             String reply = input.readLine();
             if (log) {
@@ -49,6 +51,7 @@ public class MyClient {
     }
 
     private String[] receiveLines(int length) {
+        // Receives length number of lines from the server
         try {
             String[] reply = new String[length];
             String line;
@@ -74,6 +77,7 @@ public class MyClient {
     }
 
     private String dialogue(String message) {
+        // Sends a message to and receives message from server
         try {
             if (log) {
                 System.out.println("C SENT " + message.replace("\n", ""));
@@ -94,6 +98,7 @@ public class MyClient {
     }
 
     private String FindLargest(String[] servers){
+        // Finds the first server with the highest number of cores from array of servers
         int size = 0;
         String result = null;
 
