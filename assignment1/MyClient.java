@@ -97,11 +97,10 @@ public class MyClient {
         int size = 0;
         String result = null;
 
-        for (String str: servers){
-            String[] server = str.split(" ");
-            if (Integer.parseInt(server[4]) > size){
-                size = Integer.parseInt(server[4]);
-                result = str;
+        for (String server: servers){
+            if (Integer.parseInt(server.split(" ")[4]) > size){
+                size = Integer.parseInt(server.split(" ")[4]);
+                result = server;
             }
         }
 
@@ -110,30 +109,43 @@ public class MyClient {
 
     public void run() {
         try {
+            // Handshake
             String user = "Ethan";
             String reply = dialogue("HELO\n");
             reply = dialogue("AUTH " + user + "\n");
 
+            // Get first job
             reply = dialogue("REDY\n");
-            Job job = new Job(reply.split(" "));
+            String[] job = reply.split(" ");
 
+            // Get Servers
             reply = dialogue("GETS All\n");
-
             int length = Integer.parseInt(reply.split(" ")[1]);
-
             send("OK\n");
-
             String[] servers = receiveLines(length);
-
             reply = dialogue("OK\n");
 
+            // Get largest server
             String[] largestServer = FindLargest(servers).split(" ");
 
-            send(String.format("SCHD %s %s %s\n", job.id, largestServer[0], largestServer[1]));
-            reply = receive();
+            while(!reply.equals("NONE")) {
+                // Schedule job
+                if (job != null) {
+                    dialogue(String.format("SCHD %s %s %s\n", job[2], largestServer[0], largestServer[1]));
+                }
+                
+                // Get next job
+                reply = dialogue("REDY\n");
+                if (reply.split(" ")[0].equals("JOBN")) {
+                    job = reply.split(" ");
+                }
+                else {
+                    job = null;
+                }
+            }
 
-            send("QUIT\n");
-            reply = receive();
+            // Exit
+            dialogue("QUIT\n");
 
             s.close();
 
@@ -157,22 +169,5 @@ public class MyClient {
 
         MyClient client = new MyClient(log);
         client.run();
-    }
-}
-
-class Job {
-    public int id;
-    public int estRunTime;
-    public int core;
-    public int memory;
-    public int disk;
-
-    public Job(String[] jobString) {
-        // jobString is {JOBN, submitTime, jobID, estRuntime, core, memory, disk}
-        id = Integer.parseInt(jobString[2]);
-        estRunTime = Integer.parseInt(jobString[3]);
-        core = Integer.parseInt(jobString[4]);
-        memory = Integer.parseInt(jobString[5]);
-        disk = Integer.parseInt(jobString[6]);
     }
 }
