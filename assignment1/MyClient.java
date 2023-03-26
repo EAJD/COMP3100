@@ -112,6 +112,37 @@ public class MyClient {
         return result;
     }
 
+    private String[] FindLargestType(String[] servers) {
+        // Returns the servers of the largest type
+
+        // Find largest type while also counting how many of that type
+        int size = 0;
+        String type = null;
+        int count = 0;
+        for (String server: servers) {
+            if (Integer.parseInt(server.split(" ")[4]) > size) {
+                size = Integer.parseInt(server.split(" ")[4]);
+                type = server.split(" ")[0];
+                count = 1;
+            }
+            if (server.split(" ")[0].equals(type)) {
+                count++;
+            }
+        }
+
+        // Find all servers of that type
+        String[] result = new String[count];
+        int index = 0;
+        for (String server: servers) {
+            if (server.split(" ")[0].equals(type)) {
+                result[index] = server;
+                index++;
+            }
+        }
+
+        return result;
+    }
+
     public void run() {
         try {
             // Handshake
