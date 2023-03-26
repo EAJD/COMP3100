@@ -123,7 +123,7 @@ public class MyClient {
             if (Integer.parseInt(server.split(" ")[4]) > size) {
                 size = Integer.parseInt(server.split(" ")[4]);
                 type = server.split(" ")[0];
-                count = 1;
+                count = 0;
             }
             if (server.split(" ")[0].equals(type)) {
                 count++;
@@ -162,12 +162,20 @@ public class MyClient {
             reply = dialogue("OK\n");
 
             // Get largest server
-            String[] largestServer = FindLargest(servers).split(" ");
+            String[] largestServers = FindLargestType(servers);
+            int currentServer = 0;
 
             while(!reply.equals("NONE")) {
+                if (currentServer >= largestServers.length) {
+                    currentServer = 0;
+                }
+
                 // Schedule job
                 if (job != null) {
-                    dialogue(String.format("SCHD %s %s %s\n", job[2], largestServer[0], largestServer[1]));
+                    String serverType = largestServers[currentServer].split(" ")[0];
+                    String serverId = largestServers[currentServer].split(" ")[1];
+                    dialogue(String.format("SCHD %s %s %s\n", job[2], serverType, serverId));
+                    currentServer++;
                 }
                 
                 // Get next job
