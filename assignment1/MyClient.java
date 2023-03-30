@@ -96,7 +96,7 @@ public class MyClient {
         return type;
     }
 
-    private int findTypeCount(String[] servers, String type) {
+    private int FindTypeCount(String[] servers, String type) {
         // Counts how many servers match the given type
         int count = 0;
         for (String server: servers) {
@@ -127,7 +127,7 @@ public class MyClient {
 
             // Get largest server
             String largestType = FindLargestType(servers);
-            int serverCount = findTypeCount(servers, largestType);
+            int serverCount = FindTypeCount(servers, largestType);
             int currentServer = 0;
 
             while(!reply.equals("NONE")) {
