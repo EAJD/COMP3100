@@ -84,7 +84,6 @@ public class MyClient {
 
     private String FindLargestType(String[] servers) {
         // Returns the type with the most cpu cores
-
         int size = 0;
         String type = null;
         for (String server: servers) {
@@ -108,10 +107,11 @@ public class MyClient {
     }
 
     public void run() {
+        // Runs the only implemented LRR scheduling algorithm
         try {
             // Handshake
-            String user = System.getProperty("user.name");
             String reply = dialogue("HELO\n");
+            String user = System.getProperty("user.name");
             reply = dialogue("AUTH " + user + "\n");
 
             // Get first job
@@ -132,6 +132,7 @@ public class MyClient {
 
             while(!reply.equals("NONE")) {
                 if (currentServer >= serverCount) {
+                    // Go back to first server
                     currentServer = 0;
                 }
 
@@ -164,10 +165,11 @@ public class MyClient {
 
         if (args.length > 1) {
             if (args[0].equals("-v") && args[1].equals("brief")) {
-                log = true;
+                log = true; // enables logging in the brief style
             }
             else {
-                System.out.println("Incorrect arguements");
+                // There are arguments but they are not "-v brief"
+                System.out.println("Incorrect arguements, use -v brief or no arguments");
                 return;
             }
         }
