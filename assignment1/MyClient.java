@@ -21,7 +21,7 @@ public class MyClient {
         this.log = log;
     }
 
-    private void send(String message) {
+    private void Send(String message) {
         // Sends a message to the server
         try {
             if (log) {
@@ -35,7 +35,7 @@ public class MyClient {
         }
     }
 
-    private String[] receiveLines(int length) {
+    private String[] ReceiveLines(int length) {
         // Receives length number of lines from the server
         try {
             String[] reply = new String[length];
@@ -61,7 +61,7 @@ public class MyClient {
         }
     }
 
-    private String dialogue(String message) {
+    private String Dialogue(String message) {
         // Sends a message to and receives message from the server
         try {
             if (log) {
@@ -106,24 +106,24 @@ public class MyClient {
         return count;
     }
 
-    public void run() {
+    public void Run() {
         // Runs the only implemented LRR scheduling algorithm
         try {
             // Handshake
-            String reply = dialogue("HELO\n");
+            String reply = Dialogue("HELO\n");
             String user = System.getProperty("user.name");
-            reply = dialogue("AUTH " + user + "\n");
+            reply = Dialogue("AUTH " + user + "\n");
 
             // Get first job
-            reply = dialogue("REDY\n");
+            reply = Dialogue("REDY\n");
             String[] job = reply.split(" ");
 
             // Get Servers
-            reply = dialogue("GETS All\n");
+            reply = Dialogue("GETS All\n");
             int length = Integer.parseInt(reply.split(" ")[1]);
-            send("OK\n");
-            String[] servers = receiveLines(length);
-            reply = dialogue("OK\n");
+            Send("OK\n");
+            String[] servers = ReceiveLines(length);
+            reply = Dialogue("OK\n");
 
             // Get largest server
             String largestType = FindLargestType(servers);
@@ -138,12 +138,12 @@ public class MyClient {
 
                 // Schedule job
                 if (job != null) {
-                    dialogue(String.format("SCHD %s %s %s\n", job[2], largestType, currentServer));
+                    Dialogue(String.format("SCHD %s %s %s\n", job[2], largestType, currentServer));
                     currentServer++;
                 }
                 
                 // Get next job
-                reply = dialogue("REDY\n");
+                reply = Dialogue("REDY\n");
                 job = reply.split(" ");
                 if (!job[0].equals("JOBN")) {
                     job = null;
@@ -151,7 +151,7 @@ public class MyClient {
             }
 
             // Exit
-            dialogue("QUIT\n");
+            Dialogue("QUIT\n");
 
             s.close();
 
@@ -175,6 +175,6 @@ public class MyClient {
         }
 
         MyClient client = new MyClient(log);
-        client.run();
+        client.Run();
     }
 }
