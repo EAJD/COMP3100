@@ -94,18 +94,6 @@ public class MyClient {
             }
         }
         return type;
-
-        // // Find all servers of that type
-        // String[] result = new String[count];
-        // int index = 0;
-        // for (String server: servers) {
-        //     if (server.split(" ")[0].equals(type)) {
-        //         result[index] = server;
-        //         index++;
-        //     }
-        // }
-
-        // return result;
     }
 
     private int findTypeCount(String[] servers, String type) {
