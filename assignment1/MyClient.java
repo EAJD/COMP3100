@@ -110,7 +110,7 @@ public class MyClient {
     public void run() {
         try {
             // Handshake
-            String user = "Ethan";
+            String user = System.getProperty("user.name");
             String reply = dialogue("HELO\n");
             reply = dialogue("AUTH " + user + "\n");
 
