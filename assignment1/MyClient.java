@@ -11,7 +11,7 @@ public class MyClient {
 
     public MyClient(boolean log) {
         try {
-            s = new Socket("localhost", 50000);
+            s = new Socket("localhost", 50000); // 50000 is default port for ds-sim
             output = new DataOutputStream(s.getOutputStream());
             input = new BufferedReader(new InputStreamReader(s.getInputStream()));
         }
@@ -32,21 +32,6 @@ public class MyClient {
         }
         catch (Exception e) {
             System.out.println(e);
-        }
-    }
-
-    private String receive() {
-        // Receives a message from the server
-        try {
-            String reply = input.readLine();
-            if (log) {
-                System.out.println("C RCVD " + reply);
-            }
-            return reply;
-        }
-        catch (Exception e) {
-            System.out.println(e);
-            return "";
         }
     }
 
@@ -77,7 +62,7 @@ public class MyClient {
     }
 
     private String dialogue(String message) {
-        // Sends a message to and receives message from server
+        // Sends a message to and receives message from the server
         try {
             if (log) {
                 System.out.println("C SENT " + message.replace("\n", ""));
@@ -97,50 +82,41 @@ public class MyClient {
         }
     }
 
-    private String FindLargest(String[] servers){
-        // Finds the first server with the highest number of cores from array of servers
-        int size = 0;
-        String result = null;
+    private String FindLargestType(String[] servers) {
+        // Returns the type with the most cpu cores
 
-        for (String server: servers){
-            if (Integer.parseInt(server.split(" ")[4]) > size){
-                size = Integer.parseInt(server.split(" ")[4]);
-                result = server;
-            }
-        }
-
-        return result;
-    }
-
-    private String[] FindLargestType(String[] servers) {
-        // Returns the servers of the largest type
-
-        // Find largest type while also counting how many of that type
         int size = 0;
         String type = null;
-        int count = 0;
         for (String server: servers) {
             if (Integer.parseInt(server.split(" ")[4]) > size) {
                 size = Integer.parseInt(server.split(" ")[4]);
                 type = server.split(" ")[0];
-                count = 0;
             }
+        }
+        return type;
+
+        // // Find all servers of that type
+        // String[] result = new String[count];
+        // int index = 0;
+        // for (String server: servers) {
+        //     if (server.split(" ")[0].equals(type)) {
+        //         result[index] = server;
+        //         index++;
+        //     }
+        // }
+
+        // return result;
+    }
+
+    private int findTypeCount(String[] servers, String type) {
+        // Counts how many servers match the given type
+        int count = 0;
+        for (String server: servers) {
             if (server.split(" ")[0].equals(type)) {
                 count++;
             }
         }
-
-        // Find all servers of that type
-        String[] result = new String[count];
-        int index = 0;
-        for (String server: servers) {
-            if (server.split(" ")[0].equals(type)) {
-                result[index] = server;
-                index++;
-            }
-        }
-
-        return result;
+        return count;
     }
 
     public void run() {
@@ -162,19 +138,18 @@ public class MyClient {
             reply = dialogue("OK\n");
 
             // Get largest server
-            String[] largestServers = FindLargestType(servers);
+            String largestType = FindLargestType(servers);
+            int serverCount = findTypeCount(servers, largestType);
             int currentServer = 0;
 
             while(!reply.equals("NONE")) {
-                if (currentServer >= largestServers.length) {
+                if (currentServer >= serverCount) {
                     currentServer = 0;
                 }
 
                 // Schedule job
                 if (job != null) {
-                    String serverType = largestServers[currentServer].split(" ")[0];
-                    String serverId = largestServers[currentServer].split(" ")[1];
-                    dialogue(String.format("SCHD %s %s %s\n", job[2], serverType, serverId));
+                    dialogue(String.format("SCHD %s %s %s\n", job[2], largestType, currentServer));
                     currentServer++;
                 }
                 
