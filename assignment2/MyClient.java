@@ -213,47 +213,40 @@ public class MyClient {
         reply = Dialogue("AUTH " + user + "\n");
 
         reply = Dialogue("REDY\n");
-        int largestJob = 0;
+        
         while (!reply.equals("NONE")) {
             switch (reply.split(" ")[0]) {
                 case "JOBN": // if the reply is a jobn
                 case "JOBP": // or a jobp
                     String[] job = reply.split(" ");
-                    int jobCores = Integer.parseInt(job[4]);
+
+                    // Get Capable Servers
+                    reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
+                    int length = Integer.parseInt(reply.split(" ")[1]);
+                    Send("OK\n");
+                    String[] servers = ReceiveLines(length);
+                    reply = Dialogue("OK\n");
+
                     boolean scheduled = false;
-    
-                    if (jobCores >= largestJob) {
-                        largestJob = jobCores;
-    
-                        // Get Capable Servers
-                        reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
-                        int length = Integer.parseInt(reply.split(" ")[1]);
-                        Send("OK\n");
-                        String[] servers = ReceiveLines(length);
-                        reply = Dialogue("OK\n");
-    
-                        // Find first server without any queued jobs
-                        for (int i = 0; i < servers.length; i++) {
-                            String[] server = servers[i].split(" ");
-                            if (Integer.parseInt(server[7]) < 1) {
-                                // Schedule
-                                reply = Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
-                                scheduled = true;
-                                break;
-                            }
+
+                    for (int i = 0; i < servers.length; i++) {
+                        String[] server = servers[i].split(" ");
+                        if (Integer.parseInt(server[8]) < 1) {
+                            Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
+                            scheduled = true;
+                            break;
                         }
                     }
                     if (!scheduled) {
-                        reply = Dialogue("ENQJ GQ\n");
+                        Dialogue("ENQJ GQ\n");
                     }
     
                     reply = Dialogue("REDY\n");
                     break;
-    
+
                 case "CHKQ":
                     Dialogue("DEQJ GQ 0\n");
                     reply = Dialogue("REDY\n");
-                    largestJob = 0;
                     break;
     
                 case "JCPL":
