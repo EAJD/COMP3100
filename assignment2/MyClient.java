@@ -231,7 +231,7 @@ public class MyClient {
 
                     for (int i = 0; i < servers.length; i++) {
                         String[] server = servers[i].split(" ");
-                        if (Integer.parseInt(server[8]) < 1) {
+                        if (Integer.parseInt(server[8]) < 1 && !server[2].equals("booting")) {
                             Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
                             scheduled = true;
                             break;
