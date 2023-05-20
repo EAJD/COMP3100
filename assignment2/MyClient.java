@@ -206,58 +206,67 @@ public class MyClient {
 
     public void ma() {
         // My algorithm for stage 2
-        try {
-            // Handshake
-            String reply = Dialogue("HELO\n");
-            String user = System.getProperty("user.name");
-            reply = Dialogue("AUTH " + user + "\n");
+        
+        // Handshake
+        String reply = Dialogue("HELO\n");
+        String user = System.getProperty("user.name");
+        reply = Dialogue("AUTH " + user + "\n");
 
-            // Get first job
-            reply = Dialogue("REDY\n");
-            String[] job = reply.split(" ");
-
-            while(!reply.equals("NONE")) {
-                if (job != null) {
-                    // Get Capable Servers
-                    reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
-                    int length = Integer.parseInt(reply.split(" ")[1]);
-                    Send("OK\n");
-                    String[] servers = ReceiveLines(length);
-                    reply = Dialogue("OK\n");
-
-                    String[] server = servers[0].split(" ");
-                    int index = servers.length / 2;
-                    for (int i = 1; i < servers.length; i++) {
-                        if (Integer.parseInt(servers[index].split(" ")[7]) < 1) {
-                            // if there are no waiting jobs
-                            server = servers[index].split(" ");
-                        }
-                        if (i % 2 == 0) {
-                            index += i;
-                        }
-                        else {
-                            index -= i;
+        reply = Dialogue("REDY\n");
+        int largestJob = 0;
+        while (!reply.equals("NONE")) {
+            switch (reply.split(" ")[0]) {
+                case "JOBN": // if the reply is a jobn
+                case "JOBP": // or a jobp
+                    String[] job = reply.split(" ");
+                    int jobCores = Integer.parseInt(job[4]);
+                    boolean scheduled = false;
+    
+                    if (jobCores >= largestJob) {
+                        largestJob = jobCores;
+    
+                        // Get Capable Servers
+                        reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
+                        int length = Integer.parseInt(reply.split(" ")[1]);
+                        Send("OK\n");
+                        String[] servers = ReceiveLines(length);
+                        reply = Dialogue("OK\n");
+    
+                        // Find first server without any queued jobs
+                        for (int i = 0; i < servers.length; i++) {
+                            String[] server = servers[i].split(" ");
+                            if (Integer.parseInt(server[7]) < 1) {
+                                // Schedule
+                                reply = Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
+                                scheduled = true;
+                                break;
+                            }
                         }
                     }
-
-                    // Schedule job
-                    Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
-                }
-                
-                // Get next job
-                reply = Dialogue("REDY\n");
-                job = reply.split(" ");
-                if (!job[0].equals("JOBN")) {
-                    job = null;
-                }
+                    if (!scheduled) {
+                        reply = Dialogue("ENQJ GQ\n");
+                    }
+    
+                    reply = Dialogue("REDY\n");
+                    break;
+    
+                case "CHKQ":
+                    Dialogue("DEQJ GQ 0\n");
+                    reply = Dialogue("REDY\n");
+                    largestJob = 0;
+                    break;
+    
+                case "JCPL":
+                    reply = Dialogue("REDY\n");
+                    break;
             }
+        }
 
-            // Exit
-            Dialogue("QUIT\n");
-
+        // Exit
+        Dialogue("QUIT\n");
+        try {
             s.close();
-
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e);
         }
     }
@@ -282,7 +291,8 @@ public class MyClient {
                 client.ma();
             }
             else {
-                System.out.println("args should be [algorithm] [-v brief]");
+                System.out.println("args should be [algorithm [-v brief]]");
+                System.out.println("Where algorithm can be: lrr, fc, ma");
             }
         }
         else {
