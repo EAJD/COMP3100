@@ -228,17 +228,24 @@ public class MyClient {
                     reply = Dialogue("OK\n");
 
                     boolean scheduled = false;
-
-                    for (int i = 0; i < servers.length; i++) {
-                        String[] server = servers[i].split(" ");
-                        if (Integer.parseInt(server[4]) >= Integer.parseInt(job[4])) {
-                            Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
-                            scheduled = true;
-                            break;
+                    int queueCutoff = 1;
+                    while (!scheduled) {
+                        int index = servers.length / 2;
+                        for (int i = 1; i < servers.length; i++) {
+                            String[] server = servers[index].split(" ");
+                            if (Integer.parseInt(server[7]) < queueCutoff) {
+                                Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
+                                scheduled = true;
+                                break;
+                            }
+                            if (i % 2 == 0) {
+                                index += i;
+                            }
+                            else {
+                                index -= i;
+                            }
                         }
-                    }
-                    if (!scheduled) {
-                        Dialogue("ENQJ GQ\n");
+                        queueCutoff++;
                     }
     
                     reply = Dialogue("REDY\n");
