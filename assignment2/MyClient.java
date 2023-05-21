@@ -214,39 +214,19 @@ public class MyClient {
 
         reply = Dialogue("REDY\n");
         
+        boolean queued = false;
         while (!reply.equals("NONE")) {
             switch (reply.split(" ")[0]) {
                 case "JOBN": // if the reply is a jobn
                 case "JOBP": // or a jobp
-                    String[] job = reply.split(" ");
-
-                    // Get Capable Servers
-                    reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
-                    int length = Integer.parseInt(reply.split(" ")[1]);
-                    Send("OK\n");
-                    String[] servers = ReceiveLines(length);
-                    reply = Dialogue("OK\n");
-
-                    boolean scheduled = false;
-                    int queueCutoff = 1;
-                    while (!scheduled) {
-                        int index = servers.length / 2;
-                        for (int i = 1; i < servers.length; i++) {
-                            String[] server = servers[index].split(" ");
-                            if (Integer.parseInt(server[7]) < queueCutoff) {
-                                Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
-                                scheduled = true;
-                                break;
-                            }
-                            if (i % 2 == 0) {
-                                index += i;
-                            }
-                            else {
-                                index -= i;
-                            }
-                        }
-                        queueCutoff++;
+                    if (queued && reply.split(" ")[0].equals("JOBN")) {
+                        Dialogue("DEQJ GQ 0\n");
+                        queued = false;
+                        reply = Dialogue("REDY\n");
+                        break;
                     }
+                    String[] job = reply.split(" ");
+                    SchedulePingPong(job);
     
                     reply = Dialogue("REDY\n");
                     break;
@@ -268,6 +248,37 @@ public class MyClient {
             s.close();
         } catch (Exception e) {
             System.out.println(e);
+        }
+    }
+
+    private void SchedulePingPong(String[] job) {
+        String reply = "";
+        // Get Capable Servers
+        reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
+        int length = Integer.parseInt(reply.split(" ")[1]);
+        Send("OK\n");
+        String[] servers = ReceiveLines(length);
+        reply = Dialogue("OK\n");
+
+        boolean scheduled = false;
+        int index = servers.length / 2;
+        for (int i = 1; i <= servers.length; i++) {
+            String[] server = servers[index].split(" ");
+            if (Integer.parseInt(server[7]) < 1) {
+                Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
+                scheduled = true;
+                break;
+            }
+            if (i % 2 == 0) {
+                index += i;
+            }
+            else {
+                index -= i;
+            }
+        }
+        if (!scheduled) {
+            scheduled = true;
+            Dialogue("ENQJ GQ\n");
         }
     }
 
