@@ -215,32 +215,66 @@ public class MyClient {
         reply = Dialogue("REDY\n");
         
         int queueCount = 0;
+        boolean checkQueue = false;
         while (!reply.equals("NONE")) {
-            switch (reply.split(" ")[0]) {
-                case "JOBN": // if the reply is a jobn
-                case "JOBP": // or a jobp
-                    if (queueCount > 0 && reply.split(" ")[0].equals("JOBN")) {
-                        Dialogue("DEQJ GQ 0\n");
-                        queueCount--;
+            if (checkQueue) {
+                // Check if any job in the global queue can be scheduled
+                Dialogue("DEQJ GQ 0\n");
+                reply = Dialogue("REDY\n");
+                for (int i = 0; i < queueCount; i++) {
+                    switch (reply.split(" ")[0]) {
+                        case "JOBN":
+                            Dialogue("DEQJ GQ 0\n");
+                            reply = Dialogue("REDY\n");
+                            break;
+
+                        case "JOBP":
+                            String[] job = reply.split(" ");
+                            if (SchedulePingPong(job)) {
+                                queueCount--;
+                            }
+                            reply = Dialogue("REDY\n");
+                            break;
+
+                        case "JCPL":
+                            i--;
+                            reply = Dialogue("REDY\n");
+                            break;
+                    }
+                }
+
+                checkQueue = false;
+            }
+            else {
+                switch (reply.split(" ")[0]) {
+                    case "JOBN": // if the reply is a jobn
+                    case "JOBP": // or a jobp
+                        if (queueCount > 0 && reply.split(" ")[0].equals("JOBN")) {
+                            Dialogue("DEQJ GQ 0\n");
+                            queueCount--;
+                            reply = Dialogue("REDY\n");
+                            break;
+                        }
+                        String[] job = reply.split(" ");
+                        if (SchedulePingPong(job)) {
+                            queueCount++;
+                        }
+        
                         reply = Dialogue("REDY\n");
                         break;
-                    }
-                    String[] job = reply.split(" ");
-                    if (SchedulePingPong(job)) {
-                        queueCount++;
-                    }
-    
-                    reply = Dialogue("REDY\n");
-                    break;
 
-                case "CHKQ":
-                    Dialogue("DEQJ GQ 0\n");
-                    reply = Dialogue("REDY\n");
-                    break;
-    
-                case "JCPL":
-                    reply = Dialogue("REDY\n");
-                    break;
+                    case "CHKQ":
+                        Dialogue("DEQJ GQ 0\n");
+                        reply = Dialogue("REDY\n");
+                        break;
+        
+                    case "JCPL":
+                        reply = Dialogue("REDY\n");
+                        break;
+                }
+                if (queueCount > 0) {
+                    checkQueue = true;
+                }
             }
         }
 
