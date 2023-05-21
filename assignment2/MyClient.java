@@ -107,15 +107,13 @@ public class MyClient {
                             break;
 
                         case "JOBP":
+                            queueCount--;
                             String[] job = reply.split(" ");
-                            if (SchedulePingPong(job)) {
-                                queueCount--;
-                            }
+                            SchedulePingPong(job);
                             reply = Dialogue("REDY\n");
                             break;
 
                         case "JCPL":
-                            i--;
                             reply = Dialogue("REDY\n");
                             break;
                     }
@@ -124,17 +122,14 @@ public class MyClient {
                 checkQueue = false;
             }
             else {
+                if (queueCount > 0) {
+                    checkQueue = true;
+                }
                 switch (reply.split(" ")[0]) {
                     case "JOBN": // if the reply is a jobn
                     case "JOBP": // or a jobp
-                        if (queueCount > 0 && reply.split(" ")[0].equals("JOBN")) {
-                            Dialogue("DEQJ GQ 0\n");
-                            queueCount--;
-                            reply = Dialogue("REDY\n");
-                            break;
-                        }
                         String[] job = reply.split(" ");
-                        if (SchedulePingPong(job)) {
+                        if (!SchedulePingPong(job)) {
                             queueCount++;
                         }
         
@@ -149,9 +144,6 @@ public class MyClient {
                     case "JCPL":
                         reply = Dialogue("REDY\n");
                         break;
-                }
-                if (queueCount > 0) {
-                    checkQueue = true;
                 }
             }
         }
