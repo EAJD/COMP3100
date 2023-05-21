@@ -214,19 +214,21 @@ public class MyClient {
 
         reply = Dialogue("REDY\n");
         
-        boolean queued = false;
+        int queueCount = 0;
         while (!reply.equals("NONE")) {
             switch (reply.split(" ")[0]) {
                 case "JOBN": // if the reply is a jobn
                 case "JOBP": // or a jobp
-                    if (queued && reply.split(" ")[0].equals("JOBN")) {
+                    if (queueCount > 0 && reply.split(" ")[0].equals("JOBN")) {
                         Dialogue("DEQJ GQ 0\n");
-                        queued = false;
+                        queueCount--;
                         reply = Dialogue("REDY\n");
                         break;
                     }
                     String[] job = reply.split(" ");
-                    SchedulePingPong(job);
+                    if (SchedulePingPong(job)) {
+                        queueCount++;
+                    }
     
                     reply = Dialogue("REDY\n");
                     break;
@@ -251,7 +253,7 @@ public class MyClient {
         }
     }
 
-    private void SchedulePingPong(String[] job) {
+    private boolean SchedulePingPong(String[] job) {
         String reply = "";
         // Get Capable Servers
         reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
@@ -277,9 +279,9 @@ public class MyClient {
             }
         }
         if (!scheduled) {
-            scheduled = true;
             Dialogue("ENQJ GQ\n");
         }
+        return scheduled;
     }
 
     public static void main(String[] args) {
