@@ -132,7 +132,7 @@ public class MyClient {
         reply = Dialogue("OK\n");
 
         boolean scheduled = false;
-        for (int i = servers.length-1; i > 0; i--) {
+        for (int i = 0; i < servers.length; i++) {
             String[] server = servers[i].split(" ");
             if (Integer.parseInt(server[4]) >= Integer.parseInt(job[4])) {
                 Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
