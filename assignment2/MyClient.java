@@ -92,59 +92,24 @@ public class MyClient {
 
         reply = Dialogue("REDY\n");
         
-        int queueCount = 0;
-        boolean checkQueue = false;
         while (!reply.equals("NONE")) {
-            if (checkQueue) {
-                // Check if any job in the global queue can be scheduled
-                Dialogue("DEQJ GQ 0\n");
-                reply = Dialogue("REDY\n");
-                for (int i = 0; i < queueCount; i++) {
-                    switch (reply.split(" ")[0]) {
-                        case "JOBN":
-                            Dialogue("DEQJ GQ 0\n");
-                            reply = Dialogue("REDY\n");
-                            break;
+            switch (reply.split(" ")[0]) {
+                case "JOBN": // if the reply is a jobn
+                case "JOBP": // or a jobp
+                    String[] job = reply.split(" ");
+                    SchedulePingPong(job);
+    
+                    reply = Dialogue("REDY\n");
+                    break;
 
-                        case "JOBP":
-                            queueCount--;
-                            String[] job = reply.split(" ");
-                            SchedulePingPong(job);
-                            reply = Dialogue("REDY\n");
-                            break;
-
-                        case "JCPL":
-                            reply = Dialogue("REDY\n");
-                            break;
-                    }
-                }
-
-                checkQueue = false;
-            }
-            else {
-                if (queueCount > 0) {
-                    checkQueue = true;
-                }
-                switch (reply.split(" ")[0]) {
-                    case "JOBN": // if the reply is a jobn
-                    case "JOBP": // or a jobp
-                        String[] job = reply.split(" ");
-                        if (!SchedulePingPong(job)) {
-                            queueCount++;
-                        }
-        
-                        reply = Dialogue("REDY\n");
-                        break;
-
-                    case "CHKQ":
-                        Dialogue("DEQJ GQ 0\n");
-                        reply = Dialogue("REDY\n");
-                        break;
-        
-                    case "JCPL":
-                        reply = Dialogue("REDY\n");
-                        break;
-                }
+                case "CHKQ":
+                    Dialogue("DEQJ GQ 0\n");
+                    reply = Dialogue("REDY\n");
+                    break;
+    
+                case "JCPL":
+                    reply = Dialogue("REDY\n");
+                    break;
             }
         }
 
@@ -157,7 +122,7 @@ public class MyClient {
         }
     }
 
-    private boolean SchedulePingPong(String[] job) {
+    private void SchedulePingPong(String[] job) {
         String reply = "";
         // Get Capable Servers
         reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
@@ -167,25 +132,27 @@ public class MyClient {
         reply = Dialogue("OK\n");
 
         boolean scheduled = false;
-        int index = servers.length / 2;
-        for (int i = 1; i <= servers.length; i++) {
-            String[] server = servers[index].split(" ");
-            if (Integer.parseInt(server[7]) < 1) {
+        for (int i = servers.length-1; i > 0; i--) {
+            String[] server = servers[i].split(" ");
+            if (Integer.parseInt(server[4]) >= Integer.parseInt(job[4])) {
                 Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
                 scheduled = true;
                 break;
             }
-            if (i % 2 == 0) {
-                index += i;
-            }
-            else {
-                index -= i;
-            }
         }
-        if (!scheduled) {
-            Dialogue("ENQJ GQ\n");
+        int maxJobs = 1;
+        while (!scheduled) {
+            for (int i = 0; i < servers.length; i++) {
+                String[] server = servers[i].split(" ");
+                int serverJobs = Integer.parseInt(server[7]) + Integer.parseInt(server[8]);
+                if (serverJobs < maxJobs) {
+                    Dialogue(String.format("SCHD %s %s %s\n", job[2], server[0], server[1]));
+                    scheduled = true;
+                    break;
+                }
+            }
+            maxJobs++;
         }
-        return scheduled;
     }
 
     public static void main(String[] args) {
