@@ -97,7 +97,7 @@ public class MyClient {
                 case "JOBN": // if the reply is a jobn
                 case "JOBP": // or a jobp
                     String[] job = reply.split(" ");
-                    SchedulePingPong(job);
+                    ScheduleJob(job);
     
                     reply = Dialogue("REDY\n");
                     break;
@@ -122,7 +122,7 @@ public class MyClient {
         }
     }
 
-    private void SchedulePingPong(String[] job) {
+    private void ScheduleJob(String[] job) {
         String reply = "";
         // Get Capable Servers
         reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
