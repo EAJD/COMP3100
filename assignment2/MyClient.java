@@ -131,6 +131,7 @@ public class MyClient {
         String[] servers = ReceiveLines(length);
         reply = Dialogue("OK\n");
 
+        // First pass to schedule based on cores
         boolean scheduled = false;
         for (int i = 0; i < servers.length; i++) {
             String[] server = servers[i].split(" ");
@@ -140,6 +141,8 @@ public class MyClient {
                 break;
             }
         }
+        // If no servers are immediately available
+        // Find the server with the lowest running and waiting jobs
         int maxJobs = 1;
         while (!scheduled) {
             for (int i = 0; i < servers.length; i++) {
