@@ -36,7 +36,7 @@ public class MyClient {
     }
 
     private String[] ReceiveLines(String msg) {
-        // Receives length number of lines from the server
+        // Receives Servers when given a GETS msg
         try {
             String reply = Dialogue(msg);
             int length = Integer.parseInt(reply.split(" ")[1]);
