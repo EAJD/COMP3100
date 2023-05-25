@@ -35,25 +35,29 @@ public class MyClient {
         }
     }
 
-    private String[] ReceiveLines(int length) {
+    private String[] ReceiveLines(String msg) {
         // Receives length number of lines from the server
         try {
-            String[] reply = new String[length];
+            String reply = Dialogue(msg);
+            int length = Integer.parseInt(reply.split(" ")[1]);
+            Send("OK\n");
+            
+            String[] servers = new String[length];
             String line;
-
             int index = 0;
             while (index < length) {
                 line = input.readLine();
-                reply[index] = line;
+                servers[index] = line;
                 index++;
             }
+            Dialogue("OK\n");
             if (log) {
-                System.out.println("C RCVD " + reply[0]);
+                System.out.println("C RCVD " + servers[0]);
                 for (int i = 1; i < length; i++) {
                     System.out.println(reply[i]);
                 }
             }
-            return reply;
+            return servers;
         }
         catch (Exception e) {
             System.out.println(e);
@@ -125,11 +129,7 @@ public class MyClient {
     private void ScheduleJob(String[] job) {
         String reply = "";
         // Get Capable Servers
-        reply = Dialogue(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
-        int length = Integer.parseInt(reply.split(" ")[1]);
-        Send("OK\n");
-        String[] servers = ReceiveLines(length);
-        reply = Dialogue("OK\n");
+        String[] servers = ReceiveLines(String.format("GETS Capable %s %s %s\n", job[4], job[5], job[6]));
 
         // First pass to schedule based on cores
         boolean scheduled = false;
