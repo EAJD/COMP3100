@@ -54,7 +54,7 @@ public class MyClient {
             if (log) {
                 System.out.println("C RCVD " + servers[0]);
                 for (int i = 1; i < length; i++) {
-                    System.out.println(reply[i]);
+                    System.out.println(servers[i]);
                 }
             }
             return servers;
